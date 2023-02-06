@@ -17,6 +17,7 @@ set FILES=main.cpp
 set RELEASEFLAGS=/O2 /DMAIN_DEBUG=0 /DRUNTIME_DEBUG_COMPILE=0 /DCOMPILED_DEBUG_CSO=0
 set DEBUGFLAGS=/Zi /DMAIN_DEBUG=1 /DRUNTIME_DEBUG_COMPILE=0 /DCOMPILED_DEBUG_CSO=0
 
+::TODO only link with d3dcompiler.lib if RUNTIME_DEBUG_COMPILE is 1
 set LIBS=d3d12.lib dxgi.lib d3dcompiler.lib dxguid.lib kernel32.lib user32.lib gdi32.lib
 
 ::TODO does dxc compiler produce better performing shader code?
