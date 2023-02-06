@@ -1,0 +1,32 @@
+	https://gamedev.stackexchange.com/questions/191303/specifying-a-root-signature-in-the-hlsl-code-of-a-dxr-shader
+	//vertex shader constants
+	D3D12_ROOT_CONSTANTS cbComputeDesc;
+	cbVertDesc.ShaderRegister = 0;
+	cbVertDesc.RegisterSpace = 0;                            
+	cbVertDesc.Num32BitValues = sizeof(ComputeShaderCB)/sizeof(u32);
+
+	D3D12_ROOT_PARAMETER computeRootParams[1];
+	rootParams[0].ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
+	rootParams[0].Constants = cbComputeDesc;
+	rootParams[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL; //The compute queue always uses D3D12_SHADER_VISIBILITY_ALL because it has only one active stage
+
+	//D3D12_VERSIONED_ROOT_SIGNATURE_DESC
+	D3D12_ROOT_SIGNATURE_DESC computeRootSignatureDesc;
+	rootSignatureDesc.NumParameters = 1;
+	rootSignatureDesc.pParameters = computeRootParams;
+	rootSignatureDesc.NumStaticSamplers = 0;
+	rootSignatureDesc.pStaticSamplers = nullptr;
+	rootSignatureDesc.Flags = D3D12_ROOT_SIGNATURE_FLAG_DENY_VERTEX_SHADER_ROOT_ACCESS |
+							  D3D12_ROOT_SIGNATURE_FLAG_DENY_PIXEL_SHADER_ROOT_ACCESS |
+							  D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
+							  D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS |
+							  D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS  |
+							  D3D12_ROOT_SIGNATURE_FLAG_DENY_AMPLIFICATION_SHADER_ROOT_ACCESS |
+							  D3D12_ROOT_SIGNATURE_FLAG_DENY_MESH_SHADER_ROOT_ACCESS;
+
+	ID3DBlob* serializedRootSignature;
+	if( FAILED( D3D12SerializeRootSignature( &rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &serializedRootSignature, nullptr ) ) )
+	{
+		logError( "Failed to serialize root signature!\n" );
+		return false;
+	}
