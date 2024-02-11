@@ -277,20 +277,31 @@ void InitRotArbAxisMat4f( Mat4f *a_pMat, Vec3f *a_pAxis, f32 angle )
 inline
 void InitPerspectiveProjectionMat4fOpenGL( Mat4f *a_pMat, u64 width, u64 height, f32 a_hFOV, f32 a_vFOV, f32 nearPlane, f32 farPlane )
 {
-	f32 thFOV = tanf(a_hFOV*PI_F/360);
-	f32 tvFOV = tanf(a_vFOV*PI_F/360);
-	f32 nMinF = (nearPlane-farPlane);
-	f32 xmax = nearPlane * thFOV;
-	f32 ymax = nearPlane * tvFOV;
-  	f32 ymin = -ymax;
-  	f32 xmin = -xmax;
-  	f32 w = xmax - xmin;
-  	f32 h = ymax - ymin;
+	f32 thFOV = tanf(a_hFOV*0.5f);
+	f32 tvFOV = tanf(a_vFOV*0.5f);
+	f64 dNearPlane = (f64)nearPlane;
+	f64 dFarPlane = (f64)farPlane;
+	f64 nMinF = (dNearPlane-dFarPlane);
   	f32 aspect = height / (f32)width;
-	a_pMat->m[0][0] = 2.0f*nearPlane*aspect/(w*thFOV); a_pMat->m[0][1] = 0;                        a_pMat->m[0][2] = 0;                               a_pMat->m[0][3] = 0;
-	a_pMat->m[1][0] = 0;                               a_pMat->m[1][1] = 2.0f*nearPlane/(h*tvFOV); a_pMat->m[1][2] = 0;                               a_pMat->m[1][3] = 0;
-	a_pMat->m[2][0] = 0;                               a_pMat->m[2][1] = 0;                        a_pMat->m[2][2] = (farPlane+nearPlane)/nMinF;      a_pMat->m[2][3] = -1.0f;
-	a_pMat->m[3][0] = 0;                               a_pMat->m[3][1] = 0;                        a_pMat->m[3][2] = 2.0f*(farPlane*nearPlane)/nMinF; a_pMat->m[3][3] = 0;
+	a_pMat->m[0][0] = aspect/(thFOV*thFOV); a_pMat->m[0][1] = 0;                  a_pMat->m[0][2] = 0;                               		 a_pMat->m[0][3] = 0;
+	a_pMat->m[1][0] = 0;                    a_pMat->m[1][1] = 1.0f/(tvFOV*tvFOV); a_pMat->m[1][2] = 0;                               		 a_pMat->m[1][3] = 0;
+	a_pMat->m[2][0] = 0;                    a_pMat->m[2][1] = 0;                  a_pMat->m[2][2] = (f32)((dFarPlane+dNearPlane)/nMinF);     a_pMat->m[2][3] = -1.0f;
+	a_pMat->m[3][0] = 0;                    a_pMat->m[3][1] = 0;                  a_pMat->m[3][2] = (f32)(2.0*(dFarPlane*dNearPlane)/nMinF); a_pMat->m[3][3] = 0;
+}
+inline
+void InitInvPerspectiveProjectionMat4fOpenGL( Mat4f *a_pMat, u64 width, u64 height, f32 a_hFOV, f32 a_vFOV, f32 nearPlane, f32 farPlane )
+{
+	f32 thFOV = tanf(a_hFOV*0.5f);
+	f32 tvFOV = tanf(a_vFOV*0.5f);
+	f64 dNearPlane = (f64)nearPlane;
+	f64 dFarPlane = (f64)farPlane;
+	f64 nMinF = (dNearPlane-dFarPlane);
+	f64 fFarNearDoubled = (2.0*(dFarPlane*dNearPlane));
+  	f32 invAspect = (f32)width/height;
+	a_pMat->m[0][0] = thFOV*thFOV*invAspect; 		   a_pMat->m[0][1] = 0;             a_pMat->m[0][2] = 0;     a_pMat->m[0][3] = 0;
+	a_pMat->m[1][0] = 0;                               a_pMat->m[1][1] = tvFOV * tvFOV; a_pMat->m[1][2] = 0;     a_pMat->m[1][3] = 0;
+	a_pMat->m[2][0] = 0;                               a_pMat->m[2][1] = 0;             a_pMat->m[2][2] = 0;     a_pMat->m[2][3] = (f32)(nMinF/fFarNearDoubled);
+	a_pMat->m[3][0] = 0;                               a_pMat->m[3][1] = 0;             a_pMat->m[3][2] = -1.0f; a_pMat->m[3][3] = (f32)((dFarPlane+dNearPlane)/fFarNearDoubled);
 }
 */
 
